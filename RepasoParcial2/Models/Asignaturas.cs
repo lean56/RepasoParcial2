@@ -4,7 +4,7 @@ using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace RepasoParcial.Models
+namespace RepasoParcial2.Models
 {
     public class Asignaturas
     {

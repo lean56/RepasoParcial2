@@ -5,29 +5,21 @@ using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace RepasoParcial.Models
+namespace RepasoParcial2.Models
 {
     public class Inscripcion
     {
+        [Key]
         public int InscripcionId { get; set; }
         public int EstudianteId { get; set; }
-        public string Semestre { get; set; }
-        [Required]
+        public string  Semestre { get; set; }
         public int Limite { get; set; }
-        [Required]
-
         public int Tomados { get; set; }
-        [Required]
-
         public int Disponible { get; set; }
-        [Required]
-
-        public DateTime Fecha { get; set; }
         public int Monto { get; set; }
 
         [ForeignKey("InscripcionId")]
-        public List<InscripcionDetalles> Detalles { get; set; }
-
+        public List<InscripcionDetalles>Detalles { get; set; }
         public Inscripcion()
         {
             InscripcionId = 0;
@@ -36,7 +28,6 @@ namespace RepasoParcial.Models
             Limite = 0;
             Tomados = 0;
             Disponible = 0;
-            Fecha = DateTime.Now;
             Monto = 0;
             Detalles = new List<InscripcionDetalles>();
         }

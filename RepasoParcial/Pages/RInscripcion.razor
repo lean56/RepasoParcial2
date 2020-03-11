@@ -1,0 +1,224 @@
+﻿@page "/inscripcion"
+
+<h3>Registro de Inscripcion</h3>
+
+<EditForm Model="Inscripcion" OnValidSubmit="Guardar">
+	<DataAnnotationsValidator />
+
+	<div class="container">
+
+		<div class="form-group">
+			<label for="inscripcionid">Inscripcion Id</label>
+			<div class="input-group col-3">
+				<InputNumber @bind-Value="@Inscripcion.InscripcionId" class="form-control" />
+				<button type="button" class="btn btn-outline-secondary" @onclick="Buscar">Buscar</button>
+			</div>
+		</div>
+
+		<div class="form-group">
+			<label for="fecha">Fecha</label>
+			<div class="input-group col-3">
+				<InputDate @bind-Value="@Inscripcion.Fecha" class="form-control" />
+				<button type="button" class="btn btn-outline-secondary">Buscar</button>
+			</div>
+		</div>
+
+		<div class="col-md-6 no-padding">
+			<label for="Estudiante">Estudiante</label>
+			<InputSelect @bind-Value="EstudianteSelect" class="form-control">
+				<option value="" disabled selected></option>
+				@foreach (var item in ListaEstudiante)
+				{
+					<option value="@item.EstudianteId">@item.Nombres</option>
+				}
+			</InputSelect>
+		</div>
+
+		<div class="form-group">
+			<label for="semestre">Semestre</label>
+			<InputText @bind-Value="@Inscripcion.Semestre" class="form-control" />
+			<ValidationMessage For="@(()=>Inscripcion.Semestre)" />
+		</div>
+
+		<div class="form-group">
+			<label for="limite">
+				<InputNumber @bind-Value="@Inscripcion.Limite" class="form-control" />
+				<ValidationMessage For="@(()=>Inscripcion.Limite)" />
+			</label>
+		</div>
+
+		<div class="col-md-6">
+			<label for="asigantura">Asignaturas</label>
+			<InputSelect @bind-Value="AsignaturaSelect" class="form-control" @onclick="CargarAsignatura">
+				<option value="" disabled selected>Seleccione una asignatura</option>
+				@foreach (var item in ListaAsignaturas)
+				{
+					<option value="@item.AsignaturaId">@item.Descripcion</option>
+
+				}
+			</InputSelect>
+		</div>
+
+		<div class="input-group col-3">
+			<InputNumber @bind-Value="@Precio" class="form-control" />
+			<button type="button" class="btn btn-outline-secondary" @onclick="AgregarAsignatura">Agregar</button>
+		</div>
+
+
+		<div class="card">
+			<div class="card-body">
+				<table class="table">
+					<thead class="thead-dark">
+						<tr>
+							<th>Id</th>
+							<th>Descripcion</th>
+							<th>Credito</th>
+							<th>Subtotal</th>
+							<th></th>
+						</tr>
+					</thead>
+					<tbody>
+						@foreach (var item in Inscripcion.Detalles)
+						{
+						<tr>
+							<th>@item.AsignaturaId</th>
+							<th>@item.DescripcionAsignatura</th>
+							<th>@item.Creditos</th>
+							<th>@item.Subtotal</th>
+						@*<th><button type="button" class="btn btn-outline-danger btn-sm" @onclick="(()=> EliminarAsigantura(item))">Eliminar</button></th>*@
+
+						</tr>
+						}
+					</tbody>
+				</table>
+
+				<div class="col-md-2 no-padding">
+					<label>Balance</label>
+					<InputNumber @bind-Value="@Inscripcion.Monto" class="form-control" disabled></InputNumber>
+				</div>
+			</div>
+		</div>
+		<br /><br />
+		<div class="form-group">
+			@*<button type="button" class="btn btn-outline-secondary" @onclick="Limpiar">Limpiar</button>*@
+			<button type="submit" class="btn btn-outline-success">Guardar</button>
+			<button type="button" class="btn btn-outline-danger" data-toggle="modal" data-target="#exampleModal">Eliminar</button>
+
+
+			<!--fin de modal-->
+		</div>
+
+
+
+	</div> <!--fin de container-->
+	<h5>@mensaje</h5>
+
+</EditForm>
+
+@code {
+
+	public Inscripcion Inscripcion { get; set; }
+	InscripcionController controller = new InscripcionController();
+
+	EstudianteController EstudianteController = new EstudianteController();
+	AsignaturaController asignaturaController = new AsignaturaController();
+
+	public string mensaje;
+
+	public string EstudianteSelect;
+	public string AsignaturaSelect;
+
+	private List<Estudiantes> ListaEstudiante = new List<Estudiantes>();
+	private List<Asignaturas> ListaAsignaturas = new List<Asignaturas>();
+
+	private int Precio=0;
+
+	Asignaturas Asignatura { get; set; }
+
+	protected override void OnInitialized()
+	{
+		ListaEstudiante = EstudianteController.GetList(e => true);
+		ListaAsignaturas = asignaturaController.GetList(e => true);
+		Inscripcion = new Inscripcion();
+		Asignatura = new Asignaturas();
+	}
+	public void Guardar()
+	{
+
+		Inscripcion.EstudianteId = Convert.ToInt32(EstudianteSelect);
+		if (controller.Guardar(Inscripcion))
+		{
+			mensaje = "Inscripcion guardada";
+		}
+		else
+		{
+			mensaje = "error al guardar";
+		}
+	}
+
+	private void CargarAsignatura()
+	{
+		try
+		{
+			Asignatura = asignaturaController.Buscar(Convert.ToInt32(AsignaturaSelect));
+		}
+		catch (Exception)
+		{
+
+			throw;
+		}
+		mensaje = AsignaturaSelect;
+	}
+
+	public void AgregarAsignatura()
+	{
+
+		Inscripcion.Detalles.Add(new InscripcionDetalles()
+		{
+			InscripcionId = Inscripcion.InscripcionId,
+			AsignaturaId = Asignatura.AsignaturaId,
+			DescripcionAsignatura = Asignatura.Descripcion,
+			Creditos = Asignatura.Creditos,
+			Subtotal =(Asignatura.Creditos*Precio)
+		});
+	}
+
+	public void Buscar()
+	{
+		var inscripcion = controller.Buscar(Inscripcion.InscripcionId);
+
+		if (inscripcion!=null)
+		{
+			Inscripcion = inscripcion;
+			EstudianteSelect = Convert.ToString(inscripcion.EstudianteId);
+		}
+		else
+		{
+			limpiar();
+			mensaje = "Inscripcion no existe";
+		}
+	}
+
+	public void Eliminar()
+	{
+		var inscripcio = controller.Buscar(Inscripcion.InscripcionId);
+
+		if (inscripcio != null)
+		{
+			controller.Eliminar(Inscripcion.InscripcionId);
+			limpiar();
+			mensaje = "inscripcion eliminada";
+		}
+		else
+		{
+			mensaje = "error al eliminar";
+		}
+	}
+
+	public void limpiar()
+	{
+		this.Inscripcion = new Inscripcion();
+		mensaje = "";
+	}
+
+}

@@ -1,0 +1,110 @@
+﻿@page "/estudiante"
+<h3>Registro de Estudiantes</h3>
+
+<EditForm Model="Estudiante" OnValidSubmit="Guardar">
+	<DataAnnotationsValidator/>
+
+	<div class="container">
+		<div class="form-group">
+			<label for="estudianteid">Estudiante Id</label>
+			<div class="input-group col-3">
+				<InputNumber @bind-Value="@Estudiante.EstudianteId" class="form-control" />
+				<ValidationMessage For="@(()=>Estudiante.EstudianteId)" />
+				<button type="button" class="btn btn-outline-secondary" @onclick="Buscar">Buscar</button>
+			</div>
+		
+		</div>
+
+		<div class="form-group">
+			<label for="nombres">Nombres</label>
+			<InputText @bind-Value="@Estudiante.Nombres" class="form-control"/>
+			<ValidationMessage For="@(()=>Estudiante.Nombres)"/>
+		</div>
+
+		<div class="form-group">
+			<label for="matricula">Matricula</label>
+			<InputText @bind-Value="@Estudiante.Matricula" class="form-control"/>
+			<ValidationMessage For="@(()=>Estudiante.Matricula)"/>
+		</div>
+
+		<div class="form-group">
+			<label for="balance">Balance</label>
+			<InputNumber @bind-Value="@Estudiante.Balance" class="form-control" disabled/>
+			<ValidationMessage For="@(()=>Estudiante.Balance)"/>
+		</div>
+
+		<div class="form-group">
+			<button type="button" class="btn btn-outline-info"@onclick="Limpiar" >Limpiar</button>
+			<button type="submit" class="btn btn-outline-success">Guardar</button>
+			<button type="button" class="btn btn-outline-danger" @onclick="Eliminar">Eliminar</button>
+		</div>
+
+		<h5 class="text-success">@mensaje</h5>
+
+	</div>
+
+
+</EditForm>
+
+@code {
+	[Parameter]
+	public int EstudianteId { get; set; }
+	private string mensaje;
+
+	public Estudiantes Estudiante = new Estudiantes();
+
+	EstudianteController controller = new EstudianteController();
+
+	public void Guardar()
+	{
+		if (controller.Guardar(Estudiante))
+		{
+			Limpiar();
+			mensaje = "Estudiante Guardado";
+
+		}
+		else
+		{
+			Limpiar();
+			mensaje = "Error al guardar";
+		}
+	}
+
+	public void Buscar()
+	{
+		var estudiante = controller.Buscar(Estudiante.EstudianteId);
+
+		if (estudiante != null)
+		{
+			Estudiante = estudiante;
+		}
+		else
+		{
+			Limpiar();
+			mensaje = "Estudiante no existe";
+		}
+	}
+
+	public void Eliminar()
+	{
+		var estudiante = controller.Buscar(Estudiante.EstudianteId);
+
+		if (estudiante !=null)
+		{
+			controller.Eliminar(estudiante.EstudianteId);
+			Limpiar();
+			mensaje = "Estudiante Eliminado";
+		}
+		else
+		{
+			mensaje = "Error al eliminar";
+		}
+	}
+
+	public void Limpiar()
+	{
+		mensaje = "";
+		this.Estudiante = new Estudiantes();
+	}
+
+}

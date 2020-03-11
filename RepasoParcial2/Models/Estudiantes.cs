@@ -4,26 +4,22 @@ using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace RepasoParcial.Models
+namespace RepasoParcial2.Models
 {
     public class Estudiantes
     {
         [Key]
-        public int EstudianteId { get; set; }
-        [Required]
+        public int EstudiantesId { get; set; }
         public string Nombres { get; set; }
-        [Required]
         public string Matricula { get; set; }
-        public int Balance { get; set; }
+        public int Deuda { get; set; }
 
         public Estudiantes()
         {
-            EstudianteId = 0;
+            EstudiantesId = 0;
             Nombres = string.Empty;
-            Matricula = string.Empty;
-            Balance = 0;
+            Matricula = string.Empty; 
+            Deuda = 0;
         }
-
-      
     }
 }
